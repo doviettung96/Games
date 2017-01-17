@@ -1,0 +1,11 @@
+html{
+    background-color: aquamarine;
+}
+
+canvas{
+    width: 1080px;
+    height: 560px;
+    display: block;
+    margin: 0 auto;
+    border: 1px solid black;
+}
