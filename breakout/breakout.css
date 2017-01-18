@@ -3,8 +3,8 @@ html{
 }
 
 canvas{
-    width: 1080px;
-    height: 560px;
+    width: 480px;
+    height: 320px;
     display: block;
     margin: 0 auto;
     border: 1px solid black;

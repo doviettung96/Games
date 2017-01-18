@@ -36,10 +36,9 @@ $(document).ready(function () {
     }
 
     $("#area").mousemove(function (event) {
-        // relativeX = event.pageX - canvas.offsetLeft;
-        relativeX = event.pageX - 370;
-        if (relativeX > 0 && relativeX < canvas.width)
-            barX = relativeX - barWidth / 2;
+        relativeX = event.pageX - canvas.offsetLeft;
+        if (relativeX > barWidth && relativeX < canvas.width)
+            barX = relativeX - barWidth;
     });
 
 
