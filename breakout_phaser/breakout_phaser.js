@@ -19,7 +19,7 @@ var lives = 3;
 var livesText;
 var livesLostText;
 var dx = 120, dy = -120;
-var music, failsound;
+var music, failsound, winsound;
 var playing = false;
 var startButton;
 
@@ -41,6 +41,7 @@ function preload() {
     game.load.image('brick', 'brick.png');
     game.load.audio('hit', 'hit.mp3');
     game.load.audio('fail', 'fail.mp3');
+    game.load.audio('win', 'youwin.mp3');
     game.load.spritesheet('button', 'button.png', 120, 40);
 }
 
@@ -48,13 +49,19 @@ function create() {
     //initialize the Arcade Physics engine
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
+    //where you load the music
+    music = game.add.audio('hit');
+    failsound = game.add.audio('fail');
+    winsound = game.add.audio('win');
+
+
     //2 first params are x, y coordinates
     ball = game.add.sprite(game.world.width * 0.5, game.world.height - 50, 'ball');
     //set anchor to the middle (place exactly what we want)
     ball.anchor.set(0.5, 1);
 
     //set the paddle
-    paddle = game.add.sprite(game.world.width * 0.5, game.world.height - 5, 'paddle');
+    paddle = game.add.sprite(game.world.width * 0.5, game.world.height -1, 'paddle');
     //set the anchor to the middle of the paddle's width
     paddle.anchor.set(0.5, 1);
 
@@ -105,9 +112,7 @@ function create() {
     livesLostText.anchor.set(0.5, 1);
     livesLostText.visible = false;
 
-    //where you load the music
-    music = game.add.audio('hit');
-    failsound = game.add.audio('fail');
+
 
     //when hit button, invoking the startGame function
     startButton = game.add.button(game.world.width * 0.5, game.world.height * 0.5,
@@ -170,8 +175,9 @@ function ballHitBrick(ball, brick) {
     music.play();
     //make the brick smoothly dispappear
     //scale x, y slowly resize to 0
-    var killTween = game.add.tween(brick.scale).to({x: 0, y: 0}, 500, Phaser.Easing.Elastic.Out, true, 100);
-    killTween.onComplete.addOnce(function () {
+    var killTween = game.add.tween(brick.scale);
+    killTween.to({x:0,y:0}, 200, Phaser.Easing.Linear.None);
+    killTween.onComplete.addOnce(function(){
         brick.kill();
     }, this);
     killTween.start();
@@ -179,7 +185,16 @@ function ballHitBrick(ball, brick) {
     score += 1;
     scoreText.setText('Your score: ' + score);
 
-    if (score == brickInfo.count.row * brickInfo.count.col) {
+    //number of brick remaining
+    var brick_rem = -1;
+
+    for(var i = 0; i < bricks.children.length; ++i)
+        if(bricks.children[i].alive == true)
+            brick_rem++;
+    console.log(bricks.children.length, brick_rem);
+
+    if (brick_rem == 0) {
+        winsound.play();
         alert('You win');
         location.reload();
     }
@@ -196,7 +211,7 @@ function ballLeaveScreen() {
 
         //reset all the object
         ball.reset(game.world.width * 0.5, game.world.height - 50);
-        paddle.reset(game.world.width * 0.5, game.world.height - 5);
+        paddle.reset(game.world.width * 0.5, game.world.height - 1);
 
         //when mousemove, new play is ready
         //addOnce ...
@@ -209,7 +224,7 @@ function ballLeaveScreen() {
     else {
         failsound.play();
         alert('Game over - ' +
-            'You score ' + score);
+            'You score: ' + score);
         location.reload();
     }
 }
